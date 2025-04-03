@@ -1,16 +1,17 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>Pipi the AI Cat</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-  <link rel="apple-touch-icon" href="icon.png" />
-  <link rel="manifest" href="manifest.json" />
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
+<title>Pipi-dsChat</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+<link href="icon.png" rel="apple-touch-icon"/>
+<link href="manifest.json" rel="manifest"/>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
 
     :root {
@@ -212,25 +213,33 @@
       font-size: 0.95rem;
       line-height: 1.5;
     }
-  </style>
+  
+    .bot-message code {
+      background-color: #f4f4f4;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      padding: 2px 4px;
+      font-size: 0.9rem;
+      color: #d6336c;
+    }
+</style>
 </head>
 <body>
-  <div class="container">
-    <div class="chat-box">
-      <div class="chat-header">
-        <h1><div class="cat-avatar"><i class="fas fa-paw"></i></div> Pipi - Your AI Cat Companion</h1>
-      </div>
-      <div class="messages-container" id="messagesContainer">
-        <div class="message bot-message"><div>Meow~! I'm Pipi, your lovely cat friend 🐱. Ask me anything and I’ll help with soft paws and smart answers! 🐾</div></div>
-      </div>
-      <div class="input-container">
-        <input type="text" id="userInput" placeholder="Ask Pipi anything..." />
-        <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i> Send</button>
-      </div>
-    </div>
-  </div>
+<div class="container">
+<div class="chat-box">
+<div class="chat-header">
+<h1><div class="cat-avatar"><i class="fas fa-paw"></i></div> Pipi - Your AI Cat Companion</h1>
+</div>
+<div class="messages-container" id="messagesContainer">
+<div class="message bot-message"><div>Meow~! I'm Pipi, your lovely cat friend 🐱. Ask me anything and I’ll help with soft paws and smart answers! 🐾</div></div>
+</div>
+<div class="input-container">
+<input id="userInput" placeholder="Ask Pipi anything..." style="width: 100%; padding: 0.8rem; border: 2px solid var(--primary-black); border-radius: 12px; font-size: 1rem;" type="text"/>
 
-  <script>
+</div>
+</div>
+</div>
+<script>
     const API_URL = 'https://api.deepseek.com/v1/chat/completions';
     const GLITCH_URL = 'https://pipi-portal.glitch.me/chat';
 
@@ -282,7 +291,7 @@
         if (response.ok) {
           const content = marked.parse(data.choices[0].message.content);
           replaceThinkingMessage(thinkingDiv, content);
-          playMeow();
+          
         } else {
           replaceThinkingMessage(thinkingDiv, `Oops: ${data.error?.message || 'Unknown error'}`);
         }
@@ -318,11 +327,6 @@
       div.innerHTML = `<div>${htmlContent}<div style="margin-top: 10px; opacity: 0.6;">🐾</div></div>`;
     }
 
-    function playMeow() {
-      const meow = new Audio('https://assets.mixkit.co/active_storage/sfx/275/275-preview.mp3');
-      meow.volume = 0.3;
-      meow.play();
-    }
-  </script>
+    </script>
 </body>
 </html>
