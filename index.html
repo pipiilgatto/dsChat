@@ -198,12 +198,18 @@
       border-top: 2px solid var(--chat-white);
     }
 
+    .input-wrapper {
+      max-width: 100%;
+      width: 100%;
+    }
+
     input[type="text"] {
       width: 100%;
       padding: 0.8rem;
       border: 2px solid var(--primary-black);
       border-radius: 12px;
       font-size: 1rem;
+      box-sizing: border-box;
     }
 
     input[type="text"]:focus {
@@ -228,7 +234,9 @@
         <div class="message bot-message"><div>Meow~! I'm Pipi, your lovely cat friend. Ask me anything and I’ll help with soft paws and smart answers!</div></div>
       </div>
       <div class="input-container">
-        <input type="text" id="userInput" placeholder="Ask Pipi anything..." />
+        <div class="input-wrapper">
+          <input type="text" id="userInput" placeholder="Ask Pipi anything..." />
+        </div>
       </div>
     </div>
   </div>
