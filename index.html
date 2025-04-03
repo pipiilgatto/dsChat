@@ -1,18 +1,17 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>Pipi-dsChat</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" />
-  <link rel="apple-touch-icon" href="icon.png" />
-  <link rel="manifest" href="manifest.json" />
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
+<title>Pipi the AI Cat</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+<link href="icon.png" rel="apple-touch-icon"/>
+<link href="manifest.json" rel="manifest"/>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
 
     :root {
@@ -136,26 +135,6 @@
       font-weight: 500;
     }
 
-    .bot-message code {
-      background: rgba(0, 0, 0, 0.05);
-      color: #d6336c;
-      padding: 0.2em 0.4em;
-      border-radius: 4px;
-      font-family: 'Courier New', monospace;
-      font-size: 0.95em;
-    }
-
-    .bot-message pre code {
-      display: block;
-      overflow-x: auto;
-      padding: 1em;
-      background: #2d2d2d;
-      color: white;
-      border-radius: 8px;
-      font-family: 'Courier New', monospace;
-      font-size: 0.95em;
-    }
-
     .thinking-indicator {
       display: flex;
       align-items: center;
@@ -196,20 +175,16 @@
       padding: 1rem;
       background: white;
       border-top: 2px solid var(--chat-white);
-    }
-
-    .input-wrapper {
-      max-width: 100%;
-      width: 100%;
+      display: flex;
+      gap: 0.5rem;
     }
 
     input[type="text"] {
-      width: 100%;
+      flex: 1;
       padding: 0.8rem;
       border: 2px solid var(--primary-black);
       border-radius: 12px;
       font-size: 1rem;
-      box-sizing: border-box;
     }
 
     input[type="text"]:focus {
@@ -218,30 +193,69 @@
       box-shadow: 0 0 0 3px rgba(124, 124, 124, 0.2);
     }
 
+    button {
+      padding: 0.8rem 1.2rem;
+      background: var(--primary-black);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    button:hover {
+      background: var(--secondary-black);
+    }
+
     .bot-message > div {
       font-size: 0.95rem;
       line-height: 1.5;
     }
-  </style>
+  
+.code-block {
+  position: relative;
+}
+
+.copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #444;
+  color: #fff;
+  border: none;
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  border-radius: 4px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 2;
+}
+
+.code-block:hover .copy-btn,
+.code-block:focus-within .copy-btn {
+  opacity: 1;
+}
+</style>
 </head>
 <body>
-  <div class="container">
-    <div class="chat-box">
-      <div class="chat-header">
-        <h1><div class="cat-avatar"><i class="fas fa-paw"></i></div> Pipi - dsChat</h1>
-      </div>
-      <div class="messages-container" id="messagesContainer">
-        <div class="message bot-message"><div>Meow~! I'm Pipi, your lovely cat friend. Ask me anything and I’ll help with soft paws and smart answers!</div></div>
-      </div>
-      <div class="input-container">
-        <div class="input-wrapper">
-          <input type="text" id="userInput" placeholder="Ask Pipi anything..." />
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script>
+<div class="container">
+<div class="chat-box">
+<div class="chat-header">
+<h1><div class="cat-avatar"><i class="fas fa-paw"></i></div> Pipi - Your AI Cat Companion</h1>
+</div>
+<div class="messages-container" id="messagesContainer">
+<div class="message bot-message"><div>Meow~! I'm Pipi, your lovely cat friend 🐱. Ask me anything and I’ll help with soft paws and smart answers! 🐾</div></div>
+</div>
+<div class="input-container">
+<input id="userInput" placeholder="Ask Pipi anything..." type="text"/>
+<button onclick="sendMessage()"><i class="fas fa-paper-plane"></i> Send</button>
+</div>
+</div>
+</div>
+<script>
     const API_URL = 'https://api.deepseek.com/v1/chat/completions';
     const GLITCH_URL = 'https://pipi-portal.glitch.me/chat';
 
@@ -270,7 +284,7 @@
 
       const API_KEY = await getApiKey();
       if (!API_KEY) {
-        replaceThinkingMessage(thinkingDiv, "Mew~ can't connect to the server. Try again later.");
+        replaceThinkingMessage(thinkingDiv, "Mew~ can't connect to the server. Try again later 💤");
         return;
       }
 
@@ -282,19 +296,18 @@
             'Authorization': `Bearer ${API_KEY}`
           },
           body: JSON.stringify({
-            model: 'deepseek-chat',
+            model: 'deepseek-reasoner',
             messages: [{ role: 'user', content: message }],
-            temperature: 0.3,
+            temperature: 0.6,
             max_tokens: 8192
           })
         });
         const data = await response.json();
 
         if (response.ok) {
-          const raw = data.choices[0].message.content;
-          const parsed = marked.parse(raw);
-          replaceThinkingMessage(thinkingDiv, parsed);
-          setTimeout(() => hljs.highlightAll(), 0);
+          const content = marked.parse(data.choices[0].message.content);
+          replaceThinkingMessage(thinkingDiv, content);
+          playMeow();
         } else {
           replaceThinkingMessage(thinkingDiv, `Oops: ${data.error?.message || 'Unknown error'}`);
         }
@@ -327,7 +340,37 @@
     }
 
     function replaceThinkingMessage(div, htmlContent) {
-      div.innerHTML = `<div>${htmlContent}<div style="margin-top: 10px; opacity: 0.6;">🐾</div></div>`;
+      
+const wrapWithCopy = (html) => {
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  tmp.querySelectorAll('pre code').forEach((codeBlock) => {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'code-block';
+    const button = document.createElement('button');
+    button.className = 'copy-btn';
+    button.textContent = 'Copy';
+    button.onclick = () => {
+      navigator.clipboard.writeText(codeBlock.textContent);
+      button.textContent = 'Copied!';
+      setTimeout(() => button.textContent = 'Copy', 2000);
+    };
+    const pre = codeBlock.parentElement;
+    pre.parentElement.replaceChild(wrapper, pre);
+    wrapper.appendChild(button);
+    wrapper.appendChild(pre);
+  });
+  return tmp.innerHTML;
+};
+
+div.innerHTML = `<div>${wrapWithCopy(htmlContent)}<div style="margin-top: 10px; opacity: 0.6;">🐾</div></div>`;
+
+    }
+
+    function playMeow() {
+      const meow = new Audio('https://assets.mixkit.co/active_storage/sfx/275/275-preview.mp3');
+      meow.volume = 0.3;
+      meow.play();
     }
   </script>
 </body>
