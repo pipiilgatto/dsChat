@@ -325,57 +325,127 @@
         }
       } catch (error) {
         replaceThinkingMessage(thinkingDiv, `Error: ${error.message}`);
-      }
-    }
+<script>
+let messages = [
+  {
+    role: 'system',
+    content: "You are Pipi, a cute and clever AI cat who chats like a friendly pet. Keep answers fun, helpful, and sometimes meow-ish."
+  }
+];
 
-    function addMessage(content, role) {
-      const container = document.getElementById('messagesContainer');
-      const div = document.createElement('div');
-      div.className = `message ${role}-message`;
-      div.innerHTML = content;
-      container.appendChild(div);
-      container.scrollTop = container.scrollHeight;
-    }
+const API_URL = 'https://api.deepseek.com/v1/chat/completions';
+const GLITCH_URL = 'https://pipi-portal.glitch.me/chat';
 
-    function addThinkingIndicator() {
-      const container = document.getElementById('messagesContainer');
-      const div = document.createElement('div');
-      div.className = 'message bot-message';
-      div.innerHTML = `
-        <div class="thinking-indicator">
-          <div class="dot-flashing"></div>
-          Thinking with my whiskers...
-        </div>`;
-      container.appendChild(div);
-      container.scrollTop = container.scrollHeight;
-      return div;
-    }
+document.getElementById('userInput').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') sendMessage();
+});
 
-    function replaceThinkingMessage(div, htmlContent) {
-      const wrapWithCopy = (html) => {
-        const tmp = document.createElement('div');
-        tmp.innerHTML = html;
-        tmp.querySelectorAll('pre code').forEach((codeBlock) => {
-          const wrapper = document.createElement('div');
-          wrapper.className = 'code-block';
-          const button = document.createElement('button');
-          button.className = 'copy-btn';
-          button.textContent = 'Copy';
-          button.onclick = () => {
-            navigator.clipboard.writeText(codeBlock.textContent);
-            button.textContent = 'Copied!';
-            setTimeout(() => button.textContent = 'Copy', 2000);
-          };
-          const pre = codeBlock.parentElement;
-          pre.parentElement.replaceChild(wrapper, pre);
-          wrapper.appendChild(button);
-          wrapper.appendChild(pre);
-        });
-        return tmp.innerHTML;
+async function getApiKey() {
+  try {
+    const response = await fetch(GLITCH_URL);
+    const data = await response.json();
+    return data.apiKey || null;
+  } catch {
+    return null;
+  }
+}
+
+async function sendMessage() {
+  const userInput = document.getElementById('userInput');
+  const message = userInput.value.trim();
+  if (!message) return;
+
+  addMessage(message, 'user');
+  userInput.value = '';
+  const thinkingDiv = addThinkingIndicator();
+
+  const API_KEY = await getApiKey();
+  if (!API_KEY) {
+    replaceThinkingMessage(thinkingDiv, "Mew~ can't connect to the server. Try again later.");
+    return;
+  }
+
+  messages.push({ role: 'user', content: message });
+
+  try {
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${API_KEY}`
+      },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: messages,
+        temperature: 0.3,
+        max_tokens: 8192
+      })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      const raw = data.choices[0].message.content;
+      messages.push({ role: 'assistant', content: raw });
+      const parsed = marked.parse(raw);
+      replaceThinkingMessage(thinkingDiv, parsed);
+      setTimeout(() => hljs.highlightAll(), 0);
+    } else {
+      replaceThinkingMessage(thinkingDiv, `Oops: ${data.error?.message || 'Unknown error'}`);
+    }
+  } catch (error) {
+    replaceThinkingMessage(thinkingDiv, `Error: ${error.message}`);
+  }
+}
+
+function addMessage(content, role) {
+  const container = document.getElementById('messagesContainer');
+  const div = document.createElement('div');
+  div.className = `message ${role}-message`;
+  div.innerHTML = content;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function addThinkingIndicator() {
+  const container = document.getElementById('messagesContainer');
+  const div = document.createElement('div');
+  div.className = 'message bot-message';
+  div.innerHTML = `
+    <div class="thinking-indicator">
+      <div class="dot-flashing"></div>
+      Thinking with my whiskers...
+    </div>`;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+  return div;
+}
+
+function replaceThinkingMessage(div, htmlContent) {
+  const wrapWithCopy = (html) => {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    tmp.querySelectorAll('pre code').forEach((codeBlock) => {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'code-block';
+      const button = document.createElement('button');
+      button.className = 'copy-btn';
+      button.textContent = 'Copy';
+      button.onclick = () => {
+        navigator.clipboard.writeText(codeBlock.textContent);
+        button.textContent = 'Copied!';
+        setTimeout(() => button.textContent = 'Copy', 2000);
       };
+      const pre = codeBlock.parentElement;
+      pre.parentElement.replaceChild(wrapper, pre);
+      wrapper.appendChild(button);
+      wrapper.appendChild(pre);
+    });
+    return tmp.innerHTML;
+  };
 
-      div.innerHTML = `<div>${wrapWithCopy(htmlContent)}<div style="margin-top: 10px; opacity: 0.6;">🐾</div></div>`;
-    }
-  </script>
+  div.innerHTML = `<div>${wrapWithCopy(htmlContent)}<div style="margin-top: 10px; opacity: 0.6;">🐾</div></div>`;
+}
+</script>
 </body>
 </html>
