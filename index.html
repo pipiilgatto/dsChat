@@ -292,39 +292,6 @@
       addMessage(message, 'user');
       userInput.value = '';
       const thinkingDiv = addThinkingIndicator();
-
-      const API_KEY = await getApiKey();
-      if (!API_KEY) {
-        replaceThinkingMessage(thinkingDiv, "Mew~ can't connect to the server. Try again later.");
-        return;
-      }
-
-      try {
-        const response = await fetch(API_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${API_KEY}`
-          },
-          body: JSON.stringify({
-            model: 'deepseek-chat',
-            messages: [{ role: 'user', content: message }],
-            temperature: 0.3,
-            max_tokens: 8192
-          })
-        });
-        const data = await response.json();
-
-        if (response.ok) {
-          const raw = data.choices[0].message.content;
-          const parsed = marked.parse(raw);
-          replaceThinkingMessage(thinkingDiv, parsed);
-          setTimeout(() => hljs.highlightAll(), 0);
-        } else {
-          replaceThinkingMessage(thinkingDiv, `Oops: ${data.error?.message || 'Unknown error'}`);
-        }
-      } catch (error) {
-        replaceThinkingMessage(thinkingDiv, `Error: ${error.message}`);
 <script>
 let messages = [
   {
